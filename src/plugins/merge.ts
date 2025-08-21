@@ -87,7 +87,7 @@ export class Merge extends ManifestPlugin {
       [[], []]
     );
 
-    const releaseData: ReleaseData[] = [];
+    let releaseData: ReleaseData[] = [];
     const labels = new Set<string>();
     let rawUpdates: Update[] = [];
     let rootRelease: CandidateReleasePullRequest | null = null;
@@ -103,6 +103,9 @@ export class Merge extends ManifestPlugin {
       }
     }
     const updates = mergeUpdates(rawUpdates);
+    if (rootRelease) {
+      releaseData = rootRelease.pullRequest.body.releaseData;
+    }
 
     const pullRequest = {
       title: PullRequestTitle.ofComponentTargetBranchVersion(
@@ -113,7 +116,7 @@ export class Merge extends ManifestPlugin {
         this.componentNoSpace
       ),
       body: new PullRequestBody(releaseData, {
-        useComponents: true,
+        useComponents: rootRelease ? false : true,
         header: this.pullRequestHeader,
         footer: this.pullRequestFooter,
       }),
