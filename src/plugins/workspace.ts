@@ -258,8 +258,11 @@ export abstract class WorkspacePlugin<T> extends ManifestPlugin {
       const packageName = this.packageNameFromPackage(pkg);
       this.logger.debug(`package: ${packageName}`);
       const existingCandidate = candidatesByPackage[packageName];
-      if (existingCandidate) {
-        const version = existingCandidate.pullRequest.version!;
+      if (existingCandidate || candidatesByPackage['dm-sdk']) {
+        const isRootRelease = packageName === 'dm-sdk';
+        const version = isRootRelease
+          ? existingCandidate.pullRequest.version!
+          : candidatesByPackage['dm-sdk'].pullRequest.version!;
         this.logger.debug(`version: ${version} from release-please`);
         updatedVersions.set(packageName, version);
       } else {
