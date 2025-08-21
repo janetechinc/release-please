@@ -547,23 +547,29 @@ export class Manifest {
       }
       const component = tagName.component || DEFAULT_COMPONENT_NAME;
       const path = pathsByComponent[component];
-      if (!path) {
+      if (!path && component !== '') {
         this.logger.warn(
           `Found release tag with component '${component}', but not configured in manifest`
         );
         continue;
       }
-      const expectedVersion = this.releasedVersions[path];
+      const expectedVersion = this.releasedVersions['.'];
       if (!expectedVersion) {
         this.logger.warn(
           `Unable to find expected version for path '${path}' in manifest`
         );
         continue;
       }
-      if (expectedVersion.toString() === tagName.version.toString()) {
-        this.logger.debug(`Found release for path ${path}, ${release.tagName}`);
-        releaseShasByPath[path] = release.sha;
-        releasesByPath[path] = {
+      if (
+        expectedVersion.toString() === tagName.version.toString() ||
+        (component === '' && releasesFound < 1)
+      ) {
+        const hardCodedPath = '.';
+        this.logger.debug(
+          `Found release for path ${hardCodedPath}, ${release.tagName}`
+        );
+        releaseShasByPath[hardCodedPath] = release.sha;
+        releasesByPath[hardCodedPath] = {
           name: release.name,
           tag: tagName,
           sha: release.sha,
@@ -650,7 +656,7 @@ export class Manifest {
           `Needed bootstrapping, found configured bootstrapSha ${this.bootstrapSha}`
         );
         break;
-      } else if (!needsBootstrap && releaseCommitsFound >= expectedShas) {
+      } else if (releaseCommitsFound >= expectedShas) {
         // found enough commits
         break;
       }

@@ -294,7 +294,7 @@ export abstract class BaseStrategy implements Strategy {
 
     const newVersionTag = new TagName(
       newVersion,
-      this.includeComponentInTag ? component : undefined,
+      undefined,
       this.tagSeparator,
       this.includeVInTag
     );
@@ -638,17 +638,17 @@ export abstract class BaseStrategy implements Strategy {
       pullRequestBody.releaseData.length === 1 &&
       !pullRequestBody.releaseData[0].component
     ) {
-      const branchComponent = await this.getBranchComponent();
-      // standalone release PR, ensure the components match
-      if (
-        this.normalizeComponent(branchName.component) !==
-        this.normalizeComponent(branchComponent)
-      ) {
-        this.logger.warn(
-          `PR component: ${branchName.component} does not match configured component: ${branchComponent}`
-        );
-        return;
-      }
+      // const branchComponent = await this.getBranchComponent();
+      // // standalone release PR, ensure the components match
+      // if (
+      //   this.normalizeComponent(branchName.component) !==
+      //   this.normalizeComponent(branchComponent)
+      // ) {
+      //   this.logger.warn(
+      //     `PR component: ${branchName.component} does not match configured component: ${branchComponent}`
+      //   );
+      //   return;
+      // }
       releaseData = pullRequestBody.releaseData[0];
     } else {
       // manifest release with multiple components - find the release notes
@@ -694,14 +694,11 @@ export abstract class BaseStrategy implements Strategy {
 
     const tag = new TagName(
       version,
-      this.includeComponentInTag ? component : undefined,
+      undefined,
       this.tagSeparator,
       this.includeVInTag
     );
-    const releaseName =
-      component && this.includeComponentInTag
-        ? `${component}: v${version.toString()}`
-        : `v${version.toString()}`;
+    const releaseName = `v${version.toString()}`;
     return {
       name: releaseName,
       tag,
